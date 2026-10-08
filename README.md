@@ -41,12 +41,11 @@ npm.cmd --version
 
 ## 2. Instalar los paquetes
 
-Copia o extrae el proyecto completo en `C:\projects-jn\evidence generator`. Si eliges otra ubicación, ajusta las rutas de estos ejemplos. Necesitas conexión a internet en la primera restauración y cuando falten paquetes en la caché.
+Clona, copia o extrae el proyecto en la carpeta que prefieras. Abre PowerShell en la **raíz del proyecto**, donde se encuentran `EvidenceGenerator.slnx`, `Iniciar.cmd` y este README. Todos los bloques de comandos siguientes parten de esa raíz y utilizan rutas relativas, independientemente de la unidad o carpeta elegida por cada desarrollador. Necesitas conexión a internet en la primera restauración y cuando falten paquetes en la caché.
 
 **Paso 1 — Paquetes del backend y pruebas (.NET/NuGet):**
 
 ```powershell
-Set-Location 'C:\projects-jn\evidence generator'
 dotnet restore .\EvidenceGenerator.slnx
 ```
 
@@ -55,8 +54,9 @@ Descarga las dependencias declaradas en los `.csproj`: SQLite, soporte de prueba
 **Paso 2 — Paquetes del frontend (npm):**
 
 ```powershell
-Set-Location 'C:\projects-jn\evidence generator\src\evidence-generator-web'
+Push-Location .\src\evidence-generator-web
 npm.cmd ci
+Pop-Location
 ```
 
 Instala dependencias de ejecución y desarrollo en `node_modules` utilizando las versiones de `package-lock.json`. Incluye Vue, PrimeVue, Quill, DOMPurify, Vite, TypeScript, Vitest y Playwright. No uses `--omit=dev` si vas a iniciar Vite, compilar o ejecutar pruebas.
@@ -68,11 +68,13 @@ Instala dependencias de ejecución y desarrollo en `node_modules` utilizando las
 **¿Cómo agregar un paquete durante el desarrollo?** Usa los siguientes comandos solo si necesitas una dependencia nueva; sustituye los nombres de ejemplo:
 
 ```powershell
-# Desde src/evidence-generator-web: paquete de ejecución
+Push-Location .\src\evidence-generator-web
+# Paquete de ejecución
 npm.cmd install nombre-del-paquete
 
-# Desde src/evidence-generator-web: herramienta de desarrollo
+# Herramienta de desarrollo
 npm.cmd install --save-dev nombre-del-paquete
+Pop-Location
 
 # Desde la raíz: paquete NuGet para la API
 dotnet add .\src\EvidenceGenerator.Api\EvidenceGenerator.Api.csproj package Nombre.Del.Paquete
@@ -84,10 +86,10 @@ Versiona los cambios en `package.json`, `package-lock.json` y los `.csproj`. No 
 
 ### Un solo comando
 
-Desde cualquier carpeta de PowerShell:
+Desde PowerShell, en la raíz de tu copia del proyecto:
 
 ```powershell
-& 'C:\projects-jn\evidence generator\Iniciar.cmd'
+.\Iniciar.cmd
 ```
 
 También puedes hacer doble clic en **Iniciar.cmd** o crear un acceso directo a ese archivo.
@@ -97,7 +99,7 @@ El lanzador comprueba herramientas y puertos, instala los paquetes npm si falta 
 - **Aplicación:** [http://127.0.0.1:5173](http://127.0.0.1:5173/).
 - **Estado de la API:** [http://127.0.0.1:5080/api/health](http://127.0.0.1:5080/api/health).
 - **Detener:** Ctrl+C en la terminal que inició la aplicación. Mantén esa terminal abierta mientras la utilizas; Windows puede pedir confirmar el cierre del lote.
-- **Sin abrir navegador:** `& 'C:\projects-jn\evidence generator\Iniciar.cmd' -NoBrowser`.
+- **Sin abrir navegador:** `.\Iniciar.cmd -NoBrowser`.
 
 Si cambió el archivo de dependencias y `node_modules` ya existe, ejecuta manualmente `npm.cmd ci` antes de iniciar. El lanzador no actualiza una instalación existente automáticamente.
 
@@ -108,15 +110,15 @@ Si cambió el archivo de dependencias y `node_modules` ya existe, ejecuta manual
 Terminal 1 — API:
 
 ```powershell
-Set-Location 'C:\projects-jn\evidence generator'
 dotnet run --project .\src\EvidenceGenerator.Api --no-launch-profile --urls http://127.0.0.1:5080
 ```
 
 Terminal 2 — interfaz, después de instalar los paquetes:
 
 ```powershell
-Set-Location 'C:\projects-jn\evidence generator\src\evidence-generator-web'
+Push-Location .\src\evidence-generator-web
 npm.cmd run dev -- --host 127.0.0.1 --port 5173 --strictPort
+Pop-Location
 ```
 
 En este modo debes detener ambas terminales con Ctrl+C. No inicies el lanzador a la vez que estas dos sesiones.
@@ -143,7 +145,6 @@ Detén la API antes de compilar o probar .NET en Windows para evitar bloqueo de 
 Backend, desde la raíz:
 
 ```powershell
-Set-Location 'C:\projects-jn\evidence generator'
 dotnet build .\EvidenceGenerator.slnx -c Release
 dotnet test .\tests\EvidenceGenerator.Tests
 ```
@@ -151,10 +152,11 @@ dotnet test .\tests\EvidenceGenerator.Tests
 Frontend:
 
 ```powershell
-Set-Location 'C:\projects-jn\evidence generator\src\evidence-generator-web'
+Push-Location .\src\evidence-generator-web
 npm.cmd run build
 npm.cmd test
 npm.cmd run test:e2e
+Pop-Location
 ```
 
 La compilación del frontend genera `src/evidence-generator-web/dist`. Las pruebas de navegador utilizan Microsoft Edge (`channel: msedge`); instalar solamente Chromium no sustituye ese requisito con la configuración actual. Playwright inicia una API con datos aislados en `work/e2e-data` y reutiliza Vite si ya está activo. No utiliza los borradores reales. Los resultados y capturas quedan en `work`.
@@ -166,14 +168,13 @@ La compilación del frontend genera `src/evidence-generator-web/dist`. Las prueb
 Con API y Vite detenidos, desde la raíz:
 
 ```powershell
-Set-Location 'C:\projects-jn\evidence generator'
 .\Publish-Local.ps1
 ```
 
 Restaura los paquetes npm, compila la interfaz, publica la API y reúne el resultado en `artifacts/local`. Para iniciarlo:
 
 ```powershell
-& 'C:\projects-jn\evidence generator\artifacts\local\Start-Local.ps1'
+.\artifacts\local\Start-Local.ps1
 ```
 
 Abre [http://127.0.0.1:5080](http://127.0.0.1:5080/). Esta versión sirve frontend y API juntos: no utiliza Vite ni necesita Node.js en el equipo de destino. Requiere **ASP.NET Core Runtime 10 x64** si se publica con la configuración predeterminada; el SDK 10 también cubre ese requisito.
@@ -242,3 +243,5 @@ Documentación adicional:
 - [Conexión futura a Microsoft 365 y MFA](docs/Microsoft-365-Conexion.md).
 
 La configuración actual es para uso individual local. Microsoft Graph está documentado pero no conectado; no se solicitan ni almacenan contraseñas de Microsoft 365. La apertura/impresión final en Excel, el pegado en el Outlook concreto del usuario y el micrófono requieren validación operativa.
+
+
