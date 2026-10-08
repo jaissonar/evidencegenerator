@@ -90,3 +90,9 @@ No se agregaron dependencias: se reutilizan Vue, PrimeVue, SQLite y las funcione
 ## Notificaciones flotantes
 
 Los avisos de operación aparecen abajo a la derecha sin desplazar el contenido, con fondo suave e iconos según el tipo: verde para confirmaciones, azul para información y rojo para errores. Éxitos e información se cierran a los 5 segundos activos; el contador se pausa al colocar el cursor o enfocar la X con el teclado, y continúa con el tiempo restante al salir. Los errores no tienen temporizador y requieren cerrar la X. Todas las notificaciones pueden cerrarse manualmente. Se anuncian con role=status o role=alert según su tipo. El servicio services/notifications.ts centraliza la temporización; components/Notifications.vue muestra una única pila global, incluso al cambiar de sección.
+
+## Abrir el Excel guardado y dictar
+
+En **Ubicación de borradores**, pulsa **Abrir ubicación del archivo** para abrir el Explorador con el último Excel del requerimiento seleccionado. Solo se permite abrir una ruta registrada por la aplicación y existente. Si se movió o eliminó, se informa para regenerarlo. No se crea otra descarga del navegador, conforme a la preferencia de conservar un único archivo. El endpoint POST /api/exports/open-location recibe `{ requirement }`; no acepta una ruta arbitraria del navegador.
+
+El dictado utiliza modo continuo y resultados provisionales, con indicador de audio activo, voz detectada y duración de sesión. Puede reconectarse cuando el navegador finaliza una sesión; se detiene tras tres sesiones sin resultados confirmados. Los errores de permiso, red y dispositivo se explican por separado. El texto no confirmado o que supera el límite de 4.000 caracteres queda visible para revisarlo, copiarlo o incorporarlo. No se guardan grabaciones; los resultados pendientes son temporales en la sección. La exactitud del reconocimiento y la captura física dependen del navegador, el servicio y el micrófono.

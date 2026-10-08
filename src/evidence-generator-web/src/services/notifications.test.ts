@@ -15,7 +15,7 @@ test('errores persistentes y pausa combinada de cursor y teclado', () => {
   const success = notify('Listo')!;
   pauseNotification(success); pauseNotification(success, 'focus');
   resumeNotification(success); vi.advanceTimersByTime(6000); expect(notifications.value).toHaveLength(2);
-  resumeNotification(success, 'focus'); vi.advanceTimersByTime(5000);
+  resumeNotification(success, 'focus'); vi.advanceTimersByTime(2000);
   expect(notifications.value.map(n => n.id)).toEqual([error]);
   dismissNotification(error); expect(notifications.value).toHaveLength(0);
 });

@@ -355,9 +355,11 @@ Se aceptan PNG, JPEG y WebP de hasta 10 MB como archivo de entrada. El navegador
 
 ### 8.6 Dictar
 
-Pulsar **Dictar**, autorizar el micrófono si el navegador lo solicita y hablar en español. La configuración de reconocimiento utiliza `es-CO`. El resultado se incorpora como texto y puede corregirse manualmente. **Detener** finaliza la escucha.
+Pulsar **Dictar**, autorizar el micrófono si el navegador lo solicita y hablar en español. La configuración de reconocimiento utiliza `es-CO`. El dictado es continuo. Los resultados confirmados se incorporan una sola vez; los provisionales se muestran mientras se reconocen. El punto verde indica audio activo del micrófono; el estado informa detección de voz, procesamiento y reconexión. El contador mide la duración de la sesión, no un límite de grabación. **Detener** espera hasta 2,5 segundos el cierre de la frase. Si queda texto sin confirmar, aparece para revisarlo y usarlo o descartarlo. Al alcanzar 4.000 caracteres, el sobrante se conserva en ese panel, sin insertarlo fuera del límite. Cambiar de sección detiene el micrófono; revisa los fragmentos pendientes antes de navegar.
 
 Si el navegador no implementa SpeechRecognition, el botón queda deshabilitado. Si el servicio falla o el permiso se deniega, se muestra un mensaje y se puede continuar escribiendo. El navegador puede usar un servicio externo para procesar audio; la aplicación no implementa transcripción offline ni guarda grabaciones.
+
+Si aparece **no-speech**, el servicio no detectó voz, lo que puede depender del micrófono, volumen, ruido o permisos; no indica que se haya alcanzado un límite de duración. Se reintenta hasta tres sesiones vacías consecutivas. Revisa el dispositivo de entrada predeterminado en Windows, que no esté silenciado y el permiso del micrófono para este sitio. Errores de red o permisos detienen el dictado con un aviso específico. Revisa siempre la transcripción de nombres técnicos; su exactitud depende del servicio del navegador.
 
 ### 8.7 Guardar y recuperar
 

@@ -17,7 +17,7 @@ import { applyProfile } from './domain/settings';
 import { newDocument, splitLegacyEvidenceImages } from "./domain/document";
 import { upgradeMailDefaults } from "./domain/mailDefaults";
 import {
-  getSettings, getExcelLocation, saveExcel,
+  getSettings, getExcelLocation, saveExcel, openExcelLocation,
   getDocument,
   saveDocument,
   getStorageInfo,
@@ -325,6 +325,7 @@ useNotification(notice, 'success');
             <p class="storage-location"><strong>Borradores:</strong> {{ storagePath }}</p>
             <p class="storage-location"><strong>Carpeta Excel configurada:</strong> {{ settings?.excelDirectory || 'Sin configurar' }}</p>
             <p class="storage-location"><strong>Último Excel de este requerimiento:</strong> {{ excelLocation?.path || 'Todavía no se ha guardado' }}</p>
+            <Button v-if="excelLocation" label="Abrir ubicación del archivo" icon="pi pi-folder-open" size="small" severity="secondary" :disabled="busy" @click="run(async () => { await openExcelLocation(doc.requirement); notice = 'Se solicitó abrir el Explorador con el Excel seleccionado.'; })" />
             </div>
           </details>
         </div>
@@ -373,6 +374,7 @@ useNotification(notice, 'success');
             <div class="description-tools">
               <small>{{ doc.description.length }} / 4000 caracteres</small
               ><VoiceButton
+                :remaining="Math.max(0, 4000 - doc.description.length - (doc.description.length ? 1 : 0))"
                 @text="
                   doc.description = `${doc.description} ${$event}`
                     .trim()

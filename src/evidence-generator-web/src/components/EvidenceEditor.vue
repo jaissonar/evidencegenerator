@@ -169,6 +169,7 @@ useNotification(imageError, 'error');
           :disabled="!evidence.description"
           @click="evidence.description = ''"
         /><VoiceButton
+          :remaining="Math.max(0, 4000 - evidence.description.length - (evidence.description.length ? 1 : 0))"
           @text="
             evidence.description = `${evidence.description} ${$event}`
               .trim()

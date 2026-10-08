@@ -7,6 +7,7 @@ builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = 
 builder.Services.AddProblemDetails();
 builder.Services.AddSingleton(_ => new DocumentStore(builder.Configuration["DataDirectory"] ?? Path.Combine(builder.Environment.ContentRootPath, "App_Data")));
 builder.Services.AddSingleton<WorkspaceStore>();
+builder.Services.AddSingleton<IFileLocationOpener, FileLocationOpener>();
 builder.Services.AddSingleton<IExcelGenerator>(new TemplateExcelGenerator(Path.Combine(builder.Environment.ContentRootPath, "Templates", "PruebasUnitarias.v1.xlsx")));
 var app = builder.Build();
 app.UseExceptionHandler();
@@ -31,6 +32,17 @@ app.MapPut("/api/settings", (WorkspaceSettings settings, WorkspaceStore store) =
     return store.Save(settings) is { } saved ? Results.Ok(saved) : Results.Conflict(new { detail = "La configuración cambió en otra ventana. Vuelve a abrir Configuración antes de guardar." });
 });
 app.MapGet("/api/exports/location", (string requirement, WorkspaceStore store) => Results.Ok(store.Location(requirement)));
+app.MapPost("/api/exports/open-location", (OpenExcelLocationRequest request, WorkspaceStore store, IFileLocationOpener opener) =>
+{
+    if (string.IsNullOrWhiteSpace(request.Requirement) || request.Requirement.Length > 80)
+        return Results.BadRequest(new { detail = "Indica el requerimiento del archivo." });
+    var location = store.Location(request.Requirement);
+    if (location is null || !File.Exists(location.Path))
+        return Results.NotFound(new { detail = "No se encontró el Excel guardado. Puede haberse movido o eliminado; guarda el Excel nuevamente." });
+    try { opener.Open(location.Path); return Results.NoContent(); }
+    catch (Exception ex) when (ex is System.ComponentModel.Win32Exception or IOException or UnauthorizedAccessException or NotSupportedException)
+    { return Results.BadRequest(new { detail = "No se pudo abrir el Explorador. Puedes copiar la ruta desde Ubicación de borradores." }); }
+});
 app.MapPost("/api/exports/save", (SaveExcelRequest request, WorkspaceStore store, IExcelGenerator excel) =>
 {
     if (request.Document is null) return Results.BadRequest(new { detail = "Falta el documento." });

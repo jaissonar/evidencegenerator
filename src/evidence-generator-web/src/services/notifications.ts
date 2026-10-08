@@ -29,11 +29,9 @@ export function pauseNotification(id: number, reason = 'hover') {
 export function notify(message: string, kind: NotificationKind = 'success') {
   if (!message) return;
   const id = ++sequence;
-  notifications.value.push({ id, message, kind });
-  if (kind !== 'error') {
-    clocks.set(id, { remaining: 5000, started: 0, pauses: new Set() });
-    resumeNotification(id);
-  }
+  notifications.value.push({ id, message, kind });  
+    clocks.set(id, { remaining: 2000, started: 0, pauses: new Set() });
+    resumeNotification(id);  
   return id;
 }
 // Synchronous watching also catches repeated messages reset within one operation.

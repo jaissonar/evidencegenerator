@@ -1,5 +1,8 @@
 import type { EvidenceDocument, DocumentSummary } from "../domain/document";
 import type { WorkspaceSettings, ExportLocation } from '../domain/settings';
+export const openExcelLocation = async (requirement: string): Promise<void> => {
+  await request('/exports/open-location', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ requirement }) });
+};
 export const getSettings = async (): Promise<WorkspaceSettings> => (await request('/settings')).json();
 export const saveSettings = async (settings: WorkspaceSettings): Promise<WorkspaceSettings> =>
   (await request('/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(settings) })).json();
