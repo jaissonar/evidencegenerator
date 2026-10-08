@@ -1,0 +1,12 @@
+**/bin/
+**/obj/
+**/node_modules/
+**/dist/
+**/App_Data/
+work/
+artifacts/
+backups/
+.env*
+!.env.example
+*.user
+*.log

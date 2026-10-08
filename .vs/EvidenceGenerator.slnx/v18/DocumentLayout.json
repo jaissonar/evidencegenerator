@@ -1,0 +1,121 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\projects-jn\\evidence generator\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{329D0922-6C1A-6BDE-F77E-DA0F3177234B}|src\\EvidenceGenerator.Api\\EvidenceGenerator.Api.csproj|c:\\projects-jn\\evidence generator\\src\\evidencegenerator.api\\documents\\documentstore.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{329D0922-6C1A-6BDE-F77E-DA0F3177234B}|src\\EvidenceGenerator.Api\\EvidenceGenerator.Api.csproj|solutionrelative:src\\evidencegenerator.api\\documents\\documentstore.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{329D0922-6C1A-6BDE-F77E-DA0F3177234B}|src\\EvidenceGenerator.Api\\EvidenceGenerator.Api.csproj|c:\\projects-jn\\evidence generator\\src\\evidencegenerator.api\\documents\\document.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{329D0922-6C1A-6BDE-F77E-DA0F3177234B}|src\\EvidenceGenerator.Api\\EvidenceGenerator.Api.csproj|solutionrelative:src\\evidencegenerator.api\\documents\\document.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{329D0922-6C1A-6BDE-F77E-DA0F3177234B}|src\\EvidenceGenerator.Api\\EvidenceGenerator.Api.csproj|c:\\projects-jn\\evidence generator\\src\\evidencegenerator.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{329D0922-6C1A-6BDE-F77E-DA0F3177234B}|src\\EvidenceGenerator.Api\\EvidenceGenerator.Api.csproj|solutionrelative:src\\evidencegenerator.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{329D0922-6C1A-6BDE-F77E-DA0F3177234B}|src\\EvidenceGenerator.Api\\EvidenceGenerator.Api.csproj|c:\\projects-jn\\evidence generator\\src\\evidencegenerator.api\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{329D0922-6C1A-6BDE-F77E-DA0F3177234B}|src\\EvidenceGenerator.Api\\EvidenceGenerator.Api.csproj|solutionrelative:src\\evidencegenerator.api\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{329D0922-6C1A-6BDE-F77E-DA0F3177234B}|src\\EvidenceGenerator.Api\\EvidenceGenerator.Api.csproj|c:\\projects-jn\\evidence generator\\src\\evidencegenerator.api\\excel\\templateexcelgenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{329D0922-6C1A-6BDE-F77E-DA0F3177234B}|src\\EvidenceGenerator.Api\\EvidenceGenerator.Api.csproj|solutionrelative:src\\evidencegenerator.api\\excel\\templateexcelgenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "DocumentStore.cs",
+              "DocumentMoniker": "C:\\projects-jn\\evidence generator\\src\\EvidenceGenerator.Api\\Documents\\DocumentStore.cs",
+              "RelativeDocumentMoniker": "src\\EvidenceGenerator.Api\\Documents\\DocumentStore.cs",
+              "ToolTip": "C:\\projects-jn\\evidence generator\\src\\EvidenceGenerator.Api\\Documents\\DocumentStore.cs",
+              "RelativeToolTip": "src\\EvidenceGenerator.Api\\Documents\\DocumentStore.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-07T21:33:21.264Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:132:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:133:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Document.cs",
+              "DocumentMoniker": "C:\\projects-jn\\evidence generator\\src\\EvidenceGenerator.Api\\Documents\\Document.cs",
+              "RelativeDocumentMoniker": "src\\EvidenceGenerator.Api\\Documents\\Document.cs",
+              "ToolTip": "C:\\projects-jn\\evidence generator\\src\\EvidenceGenerator.Api\\Documents\\Document.cs",
+              "RelativeToolTip": "src\\EvidenceGenerator.Api\\Documents\\Document.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-07T21:33:18.753Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\projects-jn\\evidence generator\\src\\EvidenceGenerator.Api\\Program.cs",
+              "RelativeDocumentMoniker": "src\\EvidenceGenerator.Api\\Program.cs",
+              "ToolTip": "C:\\projects-jn\\evidence generator\\src\\EvidenceGenerator.Api\\Program.cs",
+              "RelativeToolTip": "src\\EvidenceGenerator.Api\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-07T21:33:03.453Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "appsettings.Development.json",
+              "DocumentMoniker": "C:\\projects-jn\\evidence generator\\src\\EvidenceGenerator.Api\\appsettings.Development.json",
+              "RelativeDocumentMoniker": "src\\EvidenceGenerator.Api\\appsettings.Development.json",
+              "ToolTip": "C:\\projects-jn\\evidence generator\\src\\EvidenceGenerator.Api\\appsettings.Development.json",
+              "RelativeToolTip": "src\\EvidenceGenerator.Api\\appsettings.Development.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-10-07T21:33:01.017Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "TemplateExcelGenerator.cs",
+              "DocumentMoniker": "C:\\projects-jn\\evidence generator\\src\\EvidenceGenerator.Api\\Excel\\TemplateExcelGenerator.cs",
+              "RelativeDocumentMoniker": "src\\EvidenceGenerator.Api\\Excel\\TemplateExcelGenerator.cs",
+              "ToolTip": "C:\\projects-jn\\evidence generator\\src\\EvidenceGenerator.Api\\Excel\\TemplateExcelGenerator.cs",
+              "RelativeToolTip": "src\\EvidenceGenerator.Api\\Excel\\TemplateExcelGenerator.cs",
+              "ViewState": "AgIAAKQAAAAAAAAAAAAuwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-07T21:32:44.442Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

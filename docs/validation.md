@@ -1,0 +1,33 @@
+# Verificación de Evidence Generator 0.2.0
+
+Fecha: 7 de octubre de 2026.
+
+## Resultado
+
+- Backend: 13 pruebas correctas.
+- Frontend: 5 pruebas correctas.
+- Microsoft Edge: 1 recorrido integral correcto.
+- Compilación de frontend y publicación Release de la API: correctas.
+- Publicación local dependiente del runtime: iniciada y verificada en el navegador, con frontend estático, API y ruta de almacenamiento correctos.
+
+## Cobertura del cambio
+
+Se verificó generación con 0, 1, 7 y 17 evidencias, conservación del instructivo y estilos, ausencia de nuevos errores OOXML respecto de la plantilla, anclajes de 42 filas completas, desplazamiento final cero, borde de 12700 EMU (1 pt) y color 252932. Las imágenes panorámicas y verticales se probaron en Oracle con altura equivalente a las 42 filas originales y ancho proporcional sin límite en N. Se comprueba la relación de aspecto, el ancho físico del anclaje y que el área de impresión contiene las capturas completas. Se verifica que los atributos de altura de cada fila permanecen iguales a los de la plantilla, también en bloques SQL repetidos. No se reducen las filas para acomodar las imágenes. El encabezado exacto Plan de Pruebas se comprobó en ambas hojas.
+
+La exportación descargada por el navegador se inspeccionó además con un lector independiente: las capturas SQL y Oracle abarcan 42 filas y ambas hojas conservan el título esperado.
+
+Las pruebas de correo comprobaron un único bloque Entorno SQL, exclusión del bloque Oracle, colores de referencia, ancho de firma, avisos a 8 pt, orden después de la firma, negritas y escape de entradas. Se comprobó la incorporación de defaults en borradores anteriores sin reemplazar personalizaciones ni reponer firmas eliminadas intencionalmente en documentos actualizados.
+
+El recorrido de navegador comprobó también carga y pegado, botón Limpiar, reordenamiento, guardado, recuperación, exportación, configuración de firma y comportamiento responsive. Se revisaron capturas de escritorio, móvil y correo. El modo compilado se verificó por separado en 127.0.0.1:5080.
+
+## Límites de la verificación
+
+No se verificó la impresión dentro de Microsoft Excel ni el pegado de imágenes en una instalación real de Outlook. El dictado requiere una comprobación con micrófono real. La publicación autocontenida se ofrece como opción del script, pero la variante efectivamente ejecutada fue la dependiente del runtime.
+
+La firma original ya está incorporada. Microsoft Graph, envío automático y autenticación siguen fuera de esta versión. Los datos de prueba permanecen separados de los borradores de uso real.
+
+
+
+Actualización búsqueda/correo: 14 pruebas backend, 7 frontend y 2 recorridos de navegador correctos. La búsqueda se verifica más allá de los primeros 100 documentos, con fechas inclusivas y texto parametrizado. Se comprueban HTML seguro, avisos fijos, persistencia y regeneración del cuerpo. En navegador se comprobaron negrita, fuente Georgia, 18 pt, justificación y recuperación del borrador. Auditoría npm sin vulnerabilidades tras fijar Quill 2.0.2; no se utilizó la versión 2.0.3 afectada por el aviso de exportación HTML. Microsoft 365 quedó documentado, no conectado ni probado con un tenant real.
+
+Última revisión: destinatarios plegables, una imagen por evidencia, cabecera fija, interfaz de 12 px y Acerca del generador. Correctas 14 pruebas backend, 9 frontend y 6 recorridos de navegador. Se verificó la síntesis de cursiva en Tahoma, activar/desactivar el botón, ancho móvil, posición fija de la cabecera al desplazarse y rechazo de varias imágenes sin cargas parciales. La conversión de borradores antiguos preserva imágenes, descripciones e identificadores únicos.
