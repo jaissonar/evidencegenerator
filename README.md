@@ -2,6 +2,12 @@
 
 Aplicación local para documentar pruebas de requerimientos: organiza evidencias SQL/Oracle, genera un Excel con la plantilla institucional y prepara el correo de validación. No ejecuta consultas SQL/Oracle ni envía correos automáticamente.
 
+## Vista de la aplicación
+
+Pantalla principal de Evidence Generator con el tema morado: información general del requerimiento, navegación por secciones y acciones para guardar el borrador o descargar el Excel.
+
+![Vista principal de Evidence Generator: formulario de información general, menú de evidencias SQL y Oracle y editor de correo](docs/images/evidence-generator-preview.png)
+
 ## Índice
 
 - [Requisitos y descargas](#1-requisitos-y-descargas)
@@ -243,5 +249,6 @@ Documentación adicional:
 - [Conexión futura a Microsoft 365 y MFA](docs/Microsoft-365-Conexion.md).
 
 La configuración actual es para uso individual local. Microsoft Graph está documentado pero no conectado; no se solicitan ni almacenan contraseñas de Microsoft 365. La apertura/impresión final en Excel, el pegado en el Outlook concreto del usuario y el micrófono requieren validación operativa.
+
 
 
