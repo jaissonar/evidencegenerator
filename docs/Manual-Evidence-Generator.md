@@ -264,7 +264,7 @@ Desde PowerShell, sin importar la carpeta actual:
 
 También puedes hacer doble clic en **Iniciar.cmd** desde el Explorador o crear un acceso directo a ese archivo. No requiere privilegios de administrador. El lanzador usa la carpeta del proyecto, comprueba puertos y herramientas, instala dependencias si faltan, inicia la API, espera su respuesta y abre la interfaz en el navegador predeterminado. Mantén la terminal abierta; Ctrl+C detiene los procesos iniciados por esa sesión. En el archivo .cmd puede aparecer una confirmación de Windows para terminar el lote.
 
-Si ambos servicios de Evidence Generator ya responden correctamente, el comando abre la aplicación existente sin iniciar duplicados. Si un puerto está ocupado por otro proceso o solo queda parte de una sesión anterior, muestra un error: no finaliza procesos ajenos automáticamente. Cierra la sesión anterior o usa el inicio manual por componente para completarla.
+Al ejecutar el lanzador, se inspeccionan los procesos que escuchan en 5080 y 5173. Si pertenecen a esta copia del proyecto, se cierran y la aplicación se inicia nuevamente, incluso si solo quedó la API activa. Se verifica la ruta del ejecutable o del comando y su fecha de creación antes de detenerlo. Si el proceso es ajeno o no se puede identificar, se informa su PID y no se cierra. Guarda los cambios pendientes antes de reiniciar. Los borradores ya guardados en SQLite se conservan.
 
 `Iniciar.cmd` usa PowerShell con `-ExecutionPolicy Bypass` únicamente para ese proceso; no modifica la política global ni el registro. Una política corporativa impuesta puede impedirlo. En ese caso utiliza las dos terminales de la sección 7.2 o solicita a TI la firma/aprobación del script; no desactives las políticas de la organización.
 
@@ -899,7 +899,7 @@ Métricas útiles para decidir prioridades: tiempo promedio de documentación, c
 
 ## 20. Verificación y límites conocidos
 
-La revisión de esta versión incluye compilación frontend/backend, pruebas unitarias, pruebas de API y cuatro recorridos automatizados de navegador. La última validación del frontend incluye ocho pruebas unitarias y los cuatro recorridos correctos, incluida la eliminación de evidencias SQL/Oracle y documentos. Se comprobó el inicio desde Iniciar.cmd y la reutilización de una instancia activa sin duplicar procesos. Se verifican los anclajes de 42 filas, bordes, títulos, colores y migración de defaults. Las pruebas usan un almacenamiento separado del uso real.
+La revisión de esta versión incluye compilación frontend/backend, pruebas unitarias, pruebas de API y cuatro recorridos automatizados de navegador. La última validación del frontend incluye ocho pruebas unitarias y los cuatro recorridos correctos, incluida la eliminación de evidencias SQL/Oracle y documentos. Se comprobó el inicio desde Iniciar.cmd y el reinicio de instancias anteriores del proyecto, tanto con solo la API activa como con API e interfaz activas. Se verifican los anclajes de 42 filas, bordes, títulos, colores y migración de defaults. Las pruebas usan un almacenamiento separado del uso real.
 
 La apertura e impresión final dentro de Microsoft Excel, el pegado en la versión concreta de Outlook y el micrófono real requieren validación operativa. El renderizador auxiliar de hojas utilizado en la primera entrega no representa imágenes incrustadas; por ello no se utiliza como única evidencia de fidelidad de imágenes. Se comprueban sus partes OOXML, anclajes y contenido independientemente.
 
@@ -915,5 +915,6 @@ La descripción de la implementación proviene del código y pruebas de este pro
 - [Licencias de PrimeUI y versiones MIT](https://primeui.dev/licenses/community).
 
 El comportamiento documentado debe actualizarse junto con cambios de contrato, rutas, límites, plantilla o distribución. Este archivo es documentación versionable del proyecto.
+
 
 

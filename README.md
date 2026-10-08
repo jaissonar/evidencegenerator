@@ -100,7 +100,7 @@ Desde PowerShell, en la raíz de tu copia del proyecto:
 
 También puedes hacer doble clic en **Iniciar.cmd** o crear un acceso directo a ese archivo.
 
-El lanzador comprueba herramientas y puertos, instala los paquetes npm si falta `node_modules`, inicia la API y abre el navegador. Si las dos partes de la aplicación ya están activas, abre esa instancia sin duplicarla. Si solo un puerto está ocupado, informa del conflicto para que revises la instancia anterior.
+El lanzador comprueba herramientas y puertos, instala los paquetes npm si falta `node_modules`, inicia la API y abre el navegador. Si los puertos 5080 o 5173 están ocupados por una instancia de este mismo proyecto, la cierra automáticamente, espera a que se liberen y vuelve a iniciar ambos servicios. Antes de reiniciar, guarda tus cambios pendientes. Si el puerto pertenece a otra aplicación o no se puede verificar el proceso, se detiene e informa su PID sin cerrarlo.
 
 - **Aplicación:** [http://127.0.0.1:5173](http://127.0.0.1:5173/).
 - **Estado de la API:** [http://127.0.0.1:5080/api/health](http://127.0.0.1:5080/api/health).
@@ -214,7 +214,7 @@ Antes de actualizar o trasladar datos, detén la aplicación y copia la carpeta 
 | SDK compatible no encontrado | Instala SDK .NET 10; no basta con el runtime para compilar |
 | `npm ci` informa discrepancias | Recupera `package.json` y `package-lock.json` de la misma versión; si el cambio es deliberado, el desarrollador debe regenerar y revisar el bloqueo |
 | Descarga de paquetes falla | Revisa conexión, proxy y certificados corporativos con TI; no desactives la validación TLS |
-| Puertos 5080/5173 ocupados | Cierra la sesión anterior; no termines procesos desconocidos ni cambies puertos sin ajustar el proxy |
+| Puertos 5080/5173 ocupados | Ejecuta Iniciar.cmd para reiniciar las instancias del proyecto. Si informa otro proceso, revisa su PID; no termina aplicaciones ajenas |
 | Compilación .NET informa archivo en uso | Detén la API o la versión publicada y vuelve a compilar |
 | No aparecen borradores | Comprueba modo de ejecución y ruta efectiva de App_Data |
 | Pruebas E2E no encuentran navegador | Instala Microsoft Edge y vuelve a ejecutar las pruebas |
@@ -249,6 +249,7 @@ Documentación adicional:
 - [Conexión futura a Microsoft 365 y MFA](docs/Microsoft-365-Conexion.md).
 
 La configuración actual es para uso individual local. Microsoft Graph está documentado pero no conectado; no se solicitan ni almacenan contraseñas de Microsoft 365. La apertura/impresión final en Excel, el pegado en el Outlook concreto del usuario y el micrófono requieren validación operativa.
+
 
 
 
