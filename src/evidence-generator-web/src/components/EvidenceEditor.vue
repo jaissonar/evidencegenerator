@@ -1,14 +1,17 @@
 <script setup lang="ts">
+import { useNotification } from '../services/notifications';
 import Button from "primevue/button";
 import Dialog from "primevue/dialog";
-import { computed, ref } from "vue";
+import { computed, nextTick, ref } from "vue";
+import Select from 'primevue/select';
+
 import Textarea from "primevue/textarea";
 import type { EvidenceSection, EvidenceImage } from "../domain/document";
-import { moveItem, sites } from "../domain/document";
+import { moveItem } from "../domain/document";
 import ImageInput from "./ImageInput.vue";
 import VoiceButton from "./VoiceButton.vue";
 const section = defineModel<EvidenceSection>({ required: true });
-defineProps<{ engine: string }>();
+const props = defineProps<{ engine: string; environmentUrls: string[]; connections: string[] }>();
 const collapsed = ref(new Set<string>());
 const deleteId = ref<string | null>(null);
 const deleteDialog = ref(false);
@@ -28,13 +31,18 @@ function toggleEvidence(id: string) {
   if (collapsed.value.has(id)) collapsed.value.delete(id);
   else collapsed.value.add(id);
 }
-function addEvidence() {
-  if (section.value.items.length < 50)
+async function addEvidence() {
+  if (section.value.items.length < 50) {
+    const id = crypto.randomUUID();
     section.value.items.push({
-      id: crypto.randomUUID(),
+      id,
       description: "",
       images: [],
     });
+    await nextTick();
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById(id)?.focus({ preventScroll: true });
+  }
 }
 const imageError = ref("");
 function addImages(images: EvidenceImage[], target: EvidenceImage[]) {
@@ -46,6 +54,7 @@ function addImages(images: EvidenceImage[], target: EvidenceImage[]) {
   }
   target.push(...images);
 }
+useNotification(imageError, 'error');
 </script>
 <template>
   <div class="section-heading">
@@ -54,32 +63,17 @@ function addImages(images: EvidenceImage[], target: EvidenceImage[]) {
       <h2>Evidencias {{ engine }}</h2>
     </div>
     <Button
+      class="add-evidence-fixed"
       label="Agregar evidencia"
       icon="pi pi-plus"
       :disabled="section.items.length >= 50"
       @click="addEvidence"
     />
   </div>
-  <p v-if="imageError" class="error-text" role="alert">{{ imageError }}</p>
+
   <section class="panel fields two">
-    <label
-      >URL / Sitio<input
-        v-model="section.url"
-        type="url"
-        :list="`sites-${engine}`"
-        placeholder="https://..."
-        maxlength="2048" /><datalist :id="`sites-${engine}`">
-        <option
-          v-for="site in sites"
-          :key="site"
-          :value="site"
-        /></datalist></label
-    ><label
-      >Conexión / Ambiente<input
-        v-model="section.connection"
-        placeholder="OasisComTest"
-        maxlength="150"
-    /></label>
+    <label>URL / Sitio<Select v-model="section.url" :options="props.environmentUrls" editable filter aria-label="URL / Sitio" placeholder="Selecciona o escribe una URL" /></label>
+    <label>Conexión / Ambiente<Select v-model="section.connection" :options="props.connections" editable filter aria-label="Conexión / Ambiente" placeholder="Selecciona o escribe una conexión" /></label>
   </section>
   <section class="panel">
     <div class="section-heading compact">

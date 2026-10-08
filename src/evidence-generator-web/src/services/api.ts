@@ -1,4 +1,12 @@
 import type { EvidenceDocument, DocumentSummary } from "../domain/document";
+import type { WorkspaceSettings, ExportLocation } from '../domain/settings';
+export const getSettings = async (): Promise<WorkspaceSettings> => (await request('/settings')).json();
+export const saveSettings = async (settings: WorkspaceSettings): Promise<WorkspaceSettings> =>
+  (await request('/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(settings) })).json();
+export const getExcelLocation = async (requirement: string): Promise<ExportLocation | null> =>
+  (await request(`/exports/location?${new URLSearchParams({ requirement })}`)).json();
+export const saveExcel = async (document: EvidenceDocument, directory: string): Promise<ExportLocation> =>
+  (await request('/exports/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ document, directory }) })).json();
 export const getStorageInfo = async (): Promise<{
   databasePath: string;
   provider: string;

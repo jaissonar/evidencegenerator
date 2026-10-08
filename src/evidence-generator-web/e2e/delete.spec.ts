@@ -4,7 +4,7 @@ test('cancelar y confirmar eliminación de un borrador abierto', async ({page}) 
   const requirement='MD DELETE '+Date.now();
   await page.getByLabel('Requerimiento *',{exact:true}).fill(requirement);
   await page.getByRole('button',{name:'Guardar borrador'}).click();
-  await expect(page.locator('.message.success')).toContainText('Borrador guardado');
+  await expect(page.locator('.message.success').last()).toContainText('Borrador guardado');
   await page.getByLabel('Descripción del requerimiento *').fill('Cambios pendientes');
   await page.getByRole('button',{name:'Borradores locales'}).click();
   await page.getByLabel('Buscar borradores').fill(requirement);

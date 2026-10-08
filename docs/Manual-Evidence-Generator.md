@@ -1,9 +1,9 @@
 # Evidence Generator — Manual técnico y operativo
 
 **Versión de la aplicación:** 0.2.0  
-**Fecha:** 7 de octubre de 2026  
+**Fecha:** 8 de octubre de 2026
 **Plataforma inicial:** Windows x64, ejecución local e individual  
-**Directorio del proyecto:** `C:\projects-jn\evidence generator`
+**Directorio de ejemplo (sustituir por la carpeta elegida por cada desarrollador):** `C:\ruta\evidence-generator`
 
 Este manual describe la implementación real, cómo utilizarla, cómo instalarla en otro equipo, cómo compilar y publicar, dónde se almacenan los datos y qué aspectos requieren validación o evolución. Los comandos suponen PowerShell y la ruta indicada; si se copia el proyecto, se debe sustituir esa ruta por la nueva.
 
@@ -243,10 +243,10 @@ El SDK compatible debe resolver `net10.0`. Si la restauración indica que no enc
 Copiar o clonar el proyecto completo, incluidos la plantilla XLSX, la firma PNG y el archivo de bloqueo de npm. No copiar dependencias de `node_modules` desde otro equipo: instalarlas a partir del archivo de bloqueo.
 
 ```powershell
-Set-Location 'C:\projects-jn\evidence generator'
+Set-Location 'C:\ruta\evidence-generator'
 dotnet restore EvidenceGenerator.slnx
 
-Set-Location 'C:\projects-jn\evidence generator\src\evidence-generator-web'
+Set-Location 'C:\ruta\evidence-generator\src\evidence-generator-web'
 npm ci
 ```
 
@@ -259,7 +259,7 @@ Si se va a ejecutar `npm ci` en una instalación existente, detener primero Vite
 Desde PowerShell, sin importar la carpeta actual:
 
 ```powershell
-& 'C:\projects-jn\evidence generator\Iniciar.cmd'
+& 'C:\ruta\evidence-generator\Iniciar.cmd'
 ```
 
 También puedes hacer doble clic en **Iniciar.cmd** desde el Explorador o crear un acceso directo a ese archivo. No requiere privilegios de administrador. El lanzador usa la carpeta del proyecto, comprueba puertos y herramientas, instala dependencias si faltan, inicia la API, espera su respuesta y abre la interfaz en el navegador predeterminado. Mantén la terminal abierta; Ctrl+C detiene los procesos iniciados por esa sesión. En el archivo .cmd puede aparecer una confirmación de Windows para terminar el lote.
@@ -273,7 +273,7 @@ Requiere .NET SDK 10, Node.js/npm y dependencias restauradas (internet en la pri
 ### 7.1 Inicio con el script
 
 ```powershell
-Set-Location 'C:\projects-jn\evidence generator'
+Set-Location 'C:\ruta\evidence-generator'
 .\Start-Dev.ps1
 ```
 
@@ -288,14 +288,14 @@ La terminal debe mantenerse abierta. Ctrl+C detiene el frontend y el bloque de l
 Terminal de API:
 
 ```powershell
-Set-Location 'C:\projects-jn\evidence generator'
+Set-Location 'C:\ruta\evidence-generator'
 dotnet run --project src/EvidenceGenerator.Api --no-launch-profile --urls http://127.0.0.1:5080
 ```
 
 Terminal de frontend:
 
 ```powershell
-Set-Location 'C:\projects-jn\evidence generator\src\evidence-generator-web'
+Set-Location 'C:\ruta\evidence-generator\src\evidence-generator-web'
 npm run dev
 ```
 
@@ -311,6 +311,8 @@ Invoke-RestMethod 'http://127.0.0.1:5080/api/storage'
 El primer endpoint informa `status: ok`. El segundo devuelve `provider: SQLite` y la ruta absoluta real de `evidence.db`.
 
 ## 8. Uso completo de la aplicación
+
+Las nuevas opciones se detallan en [Perfil, configuración y guardado](Perfil-y-almacenamiento.md). El botón Agregar evidencia queda fijo abajo. El correo dispone de Vista previa del correo como hoja de solo lectura y de Volver al editor para editarlo.
 
 ### 8.1 Crear el documento
 
@@ -369,13 +371,13 @@ En borradores creados antes de esta versión se completan firma y avisos solo si
 
 **Vista previa** permite comprobar contenido, secuencia, motores y capturas. No simula exactamente los saltos de página de Excel.
 
-**Descargar Excel** genera el archivo con el estado actual de la pantalla, incluso si todavía no se guardó como borrador. Exportar no equivale a guardar. El nombre es `Pruebas Unitarias - <requerimiento>.xlsx`, y el navegador controla su ubicación de descarga.
+**Guardar Excel** genera el archivo con el estado actual de la pantalla, incluso si todavía no se guardó como borrador. Elige Preguntar ubicación o Carpeta configurada; indica una ruta completa local. Se actualiza `Pruebas Unitarias - <requerimiento>.xlsx` en esa carpeta, sin sufijos. La última ruta se registra en SQLite y aparece en Ubicación de borradores. Guardar Excel no guarda el borrador. Si el archivo está bloqueado, se conserva el anterior y se informa el error. Cambiar carpeta o requerimiento deja el archivo anterior intacto.
 
 ### 8.9 Preparar el correo
 
-Completar nombre del destinatario, Para, CC y asunto. El asunto se propone a partir del requerimiento y puede personalizarse. Elegir Tahoma 11 o 12 pt como base; el editor permite cambiar fuente, tamaño y formato por selección.
+Seleccionar varios contactos en Para y CC mediante listas filtrables por nombre o correo; administrar los contactos en Perfil y configuración. Los destinatarios guardados de borradores anteriores se mantienen disponibles aunque no estén en el catálogo. Completar saludo y asunto. El asunto se propone a partir del requerimiento y puede personalizarse. Elegir Tahoma 11 o 12 pt como base; el editor permite cambiar fuente, tamaño y formato por selección.
 
-La firma incorporada aparece automáticamente en documentos nuevos. Su ancho inicial es 420 px; se ofrecen 280, 360, 420, 480 y 600 px. El alto se ajusta proporcionalmente. El contenedor de vista previa limita el ancho en pantallas pequeñas.
+La firma configurada en el perfil aparece en documentos nuevos. Antes de configurar el perfil se utiliza la firma incorporada. Su ancho inicial es 420 px; se ofrecen 280, 360, 420, 480 y 600 px. El alto se ajusta proporcionalmente. El contenedor de vista previa limita el ancho en pantallas pequeñas.
 
 **Usar firma predeterminada** recupera la imagen suministrada. **Cargar firma** permite reemplazarla solo en el documento actual. Los avisos se incorporan automáticamente desde los textos fijos y no son editables. Cada borrador conserva su configuración al guardarse.
 
@@ -405,7 +407,7 @@ La eliminación utiliza el identificador de la evidencia, no su posición, para 
 
 ### 8.14 Cabecera fija y tamaño de la interfaz
 
-La barra superior permanece visible al desplazarse y cambiar de sección. Reúne el requerimiento, estado del guardado, Guardar borrador y Descargar Excel. Una segunda línea compacta muestra cantidades de evidencias/capturas, formato y Ubicación de borradores (desplegable). Sustituye el título y las tarjetas grandes repetidas de la versión anterior. En móvil se organiza en varias líneas para que los botones sigan disponibles. El tamaño base de la interfaz es 12 px; se conserva Tahoma, la jerarquía de títulos y el formato propio del correo (11/12 pt de base y avisos de 8 pt).
+La barra superior permanece visible al desplazarse y cambiar de sección. Reúne el requerimiento, estado del guardado, Guardar borrador y Guardar Excel. Una segunda línea compacta muestra cantidades de evidencias/capturas, formato y Ubicación de borradores (desplegable). Sustituye el título y las tarjetas grandes repetidas de la versión anterior. En móvil se organiza en varias líneas para que los botones sigan disponibles. El tamaño base de la interfaz es 12 px; se conserva Tahoma, la jerarquía de títulos y el formato propio del correo (11/12 pt de base y avisos de 8 pt).
 
 ### 8.15 Acerca del generador
 
@@ -573,13 +575,13 @@ Comprobado mediante lectura real del portapapeles en Edge: Georgia, 18 pt, negri
 Ruta predeterminada en desarrollo:
 
 ```text
-C:\projects-jn\evidence generator\src\EvidenceGenerator.Api\App_Data\evidence.db
+C:\ruta\evidence-generator\src\EvidenceGenerator.Api\App_Data\evidence.db
 ```
 
 En la publicación predeterminada:
 
 ```text
-C:\projects-jn\evidence generator\artifacts\local\App_Data\evidence.db
+C:\ruta\evidence-generator\artifacts\local\App_Data\evidence.db
 ```
 
 Son ubicaciones diferentes. Publicar no copia los borradores de desarrollo. Para reutilizarlos se debe hacer un respaldo y traslado explícito o configurar `DataDirectory` con una ubicación común elegida por el usuario. La ruta visible en la aplicación evita confundir ambas bases.
@@ -632,6 +634,9 @@ Base64 aumenta el tamaño respecto del PNG original. El límite de solicitud pue
 |---|---|
 | GET `/api/health` | Estado y plantilla activa |
 | GET `/api/storage` | Proveedor y ruta absoluta de SQLite |
+| GET / PUT `/api/settings` | Preferencias locales con revisión optimista |
+| GET `/api/exports/location?requirement=...` | Última ubicación del requerimiento |
+| POST `/api/exports/save` | Genera y actualiza el Excel en una carpeta local |
 | GET `/api/documents` | Búsqueda de borradores por texto/fechas, paginada en bloques de 100 |
 | GET `/api/documents/{id}` | Documento completo o 404 |
 | PUT `/api/documents/{id}` | Crea o actualiza con revisión optimista |
@@ -654,7 +659,7 @@ Eliminación: DELETE /api/documents/{id}?revision={revision}. Respuestas: 204 el
 Detener la API antes de compilar en Windows: el ejecutable en uso puede bloquear su reemplazo.
 
 ```powershell
-Set-Location 'C:\projects-jn\evidence generator'
+Set-Location 'C:\ruta\evidence-generator'
 dotnet build EvidenceGenerator.slnx -c Release
 dotnet test EvidenceGenerator.slnx
 ```
@@ -662,7 +667,7 @@ dotnet test EvidenceGenerator.slnx
 ### 13.2 Frontend
 
 ```powershell
-Set-Location 'C:\projects-jn\evidence generator\src\evidence-generator-web'
+Set-Location 'C:\ruta\evidence-generator\src\evidence-generator-web'
 npm run build
 npm test
 ```
@@ -672,7 +677,7 @@ La compilación comprueba tipos con `vue-tsc` y después genera `dist` con Vite.
 ### 13.3 Prueba integral
 
 ```powershell
-Set-Location 'C:\projects-jn\evidence generator\src\evidence-generator-web'
+Set-Location 'C:\ruta\evidence-generator\src\evidence-generator-web'
 npm run test:e2e
 ```
 
@@ -701,7 +706,7 @@ El recorrido crea un requerimiento de prueba, agrega capturas, simula pegado, li
 Detener API y Vite antes de publicar. El script comprueba los puertos para anticipar bloqueos de archivos en Windows.
 
 ```powershell
-Set-Location 'C:\projects-jn\evidence generator'
+Set-Location 'C:\ruta\evidence-generator'
 .\Publish-Local.ps1
 ```
 
@@ -714,7 +719,7 @@ Esta variante depende de que el equipo tenga instalado un runtime ASP.NET Core 1
 ### 14.2 Iniciar la publicación
 
 ```powershell
-Set-Location 'C:\projects-jn\evidence generator\artifacts\local'
+Set-Location 'C:\ruta\evidence-generator\artifacts\local'
 .\Start-Local.ps1
 ```
 
@@ -723,7 +728,7 @@ Abrir **http://127.0.0.1:5080/**. En este modo no se ejecuta Vite y no se utiliz
 Si PowerShell impide ejecutar el script:
 
 ```powershell
-Set-Location 'C:\projects-jn\evidence generator\artifacts\local'
+Set-Location 'C:\ruta\evidence-generator\artifacts\local'
 .\EvidenceGenerator.Api.exe --urls http://127.0.0.1:5080
 ```
 
@@ -734,8 +739,8 @@ El directorio actual debe ser el de publicación para encontrar configuración, 
 Para generar un resultado que incluya el runtime:
 
 ```powershell
-Set-Location 'C:\projects-jn\evidence generator'
-.\Publish-Local.ps1 -SelfContained -OutputDirectory 'C:\projects-jn\evidence generator\artifacts\standalone'
+Set-Location 'C:\ruta\evidence-generator'
+.\Publish-Local.ps1 -SelfContained -OutputDirectory 'C:\ruta\evidence-generator\artifacts\standalone'
 ```
 
 Incluye más archivos y ocupa más espacio. El script dirige la publicación a `win-x64`. Para otro sistema o arquitectura se debe revisar el destino, proveedor nativo SQLite y las pruebas. El modo verificado en esta entrega es la publicación dependiente del runtime; la opción autocontenida está preparada mediante `dotnet publish`, pero debe validarse también en el equipo receptor.
@@ -759,8 +764,8 @@ No se configura un servicio de Windows ni inicio automático. Tampoco es un inst
 En desarrollo, utilizar una ruta absoluta:
 
 ```powershell
-Set-Location 'C:\projects-jn\evidence generator'
-dotnet run --project src/EvidenceGenerator.Api --no-launch-profile -- --urls http://127.0.0.1:5080 --DataDirectory 'C:\projects-jn\evidence generator\data'
+Set-Location 'C:\ruta\evidence-generator'
+dotnet run --project src/EvidenceGenerator.Api --no-launch-profile -- --urls http://127.0.0.1:5080 --DataDirectory 'C:\ruta\evidence-generator\data'
 ```
 
 En publicación, añadir `--DataDirectory` al ejecutable de forma equivalente. La ubicación debe existir o poder crearse. Cambiarla selecciona otra base; no traslada datos de la ubicación anterior. Verificar la ruta mostrada después de reiniciar.
@@ -771,7 +776,7 @@ Los puertos 5173 y 5080 están coordinados entre Vite, scripts, lista de orígen
 
 ### 15.3 Firma y avisos
 
-Para cambiar los defaults de documentos nuevos, actualizar `domain/mailDefaults.ts` o el recurso PNG. Para cambiar un documento existente, utilizar los controles del módulo de correo y guardar. Cambiar los defaults del código no debe sobrescribir automáticamente contenido personalizado de documentos guardados.
+Para cambiar nombre, foto, carpeta, modo de guardado y firma de documentos nuevos, abrir **Perfil y configuración**. Allí también se administran contactos (hasta 200), URL (hasta 100) y conexiones (hasta 100), como listas independientes disponibles en SQL y Oracle. La foto solo aparece en el perfil. Guardar configuración es independiente de Guardar borrador. Para cambiar un documento existente, utilizar los controles del módulo de correo y guardar. Cambiar los defaults del código no debe sobrescribir automáticamente contenido personalizado de documentos guardados.
 
 ### 15.4 Límites
 
@@ -794,9 +799,9 @@ Validación: compilación TypeScript/Vite y cinco pruebas existentes correctas. 
 Guardar cambios, detener la aplicación y copiar toda la carpeta real de datos indicada en la interfaz. Ejemplo para desarrollo:
 
 ```powershell
-$backupPath = 'C:\projects-jn\evidence generator\backups\2026-10-07'
+$backupPath = 'C:\ruta\evidence-generator\backups\2026-10-07'
 New-Item -ItemType Directory -Force $backupPath
-Copy-Item -LiteralPath 'C:\projects-jn\evidence generator\src\EvidenceGenerator.Api\App_Data' -Destination $backupPath -Recurse
+Copy-Item -LiteralPath 'C:\ruta\evidence-generator\src\EvidenceGenerator.Api\App_Data' -Destination $backupPath -Recurse
 ```
 
 Guardar además el código o publicación de la versión utilizada y su plantilla. No hacer copias parciales de una base activa ignorando WAL. Para copias en caliente futuras conviene implementar la API de backup de SQLite.
@@ -876,9 +881,9 @@ Antes de modificar el generador, revisar su contrato de filas. Antes de cambiar 
 Usar cambios deliberados de versiones y conservar `package-lock.json`. Revisar licencias al actualizar PrimeVue. Auditar con:
 
 ```powershell
-Set-Location 'C:\projects-jn\evidence generator'
+Set-Location 'C:\ruta\evidence-generator'
 dotnet list package --vulnerable --include-transitive
-Set-Location 'C:\projects-jn\evidence generator\src\evidence-generator-web'
+Set-Location 'C:\ruta\evidence-generator\src\evidence-generator-web'
 npm audit
 ```
 
@@ -918,3 +923,8 @@ El comportamiento documentado debe actualizarse junto con cambios de contrato, r
 
 
 
+
+
+### Actualización: catálogos independientes y avisos flotantes
+
+Configuración ya no solicita nombre ni motor del ambiente. Usa listas separadas de URL y conexiones. En SQL y Oracle los valores se eligen independientemente, con filtro y escritura manual. Los registros anteriores se separan automáticamente sin modificar borradores. Consulta Perfil-y-almacenamiento.md para la migración y el comportamiento de las notificaciones de 5 segundos, pausa con cursor/foco y cierre manual de errores.

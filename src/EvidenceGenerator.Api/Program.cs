@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = DocumentValidation.MaxRequestBytes);
 builder.Services.AddProblemDetails();
 builder.Services.AddSingleton(_ => new DocumentStore(builder.Configuration["DataDirectory"] ?? Path.Combine(builder.Environment.ContentRootPath, "App_Data")));
+builder.Services.AddSingleton<WorkspaceStore>();
 builder.Services.AddSingleton<IExcelGenerator>(new TemplateExcelGenerator(Path.Combine(builder.Environment.ContentRootPath, "Templates", "PruebasUnitarias.v1.xlsx")));
 var app = builder.Build();
 app.UseExceptionHandler();
@@ -23,6 +24,23 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 app.MapGet("/api/health", () => Results.Ok(new { status = "ok", template = "PruebasUnitarias.v1" }));
 app.MapGet("/api/storage", (DocumentStore store) => Results.Ok(new { databasePath = store.DatabasePath, provider = "SQLite" }));
+app.MapGet("/api/settings", (WorkspaceStore store) => Results.Ok(store.Get()));
+app.MapPut("/api/settings", (WorkspaceSettings settings, WorkspaceStore store) =>
+{
+    if (WorkspaceStore.Validate(settings) is { } error) return Results.BadRequest(new { detail = error });
+    return store.Save(settings) is { } saved ? Results.Ok(saved) : Results.Conflict(new { detail = "La configuración cambió en otra ventana. Vuelve a abrir Configuración antes de guardar." });
+});
+app.MapGet("/api/exports/location", (string requirement, WorkspaceStore store) => Results.Ok(store.Location(requirement)));
+app.MapPost("/api/exports/save", (SaveExcelRequest request, WorkspaceStore store, IExcelGenerator excel) =>
+{
+    if (request.Document is null) return Results.BadRequest(new { detail = "Falta el documento." });
+    if (DocumentValidation.Validate(request.Document, true) is { } error) return Results.BadRequest(new { detail = error });
+    var directory = request.Directory ?? store.Get().ExcelDirectory;
+    if (!string.IsNullOrWhiteSpace(directory) && !WorkspaceStore.ValidDirectory(directory)) return Results.BadRequest(new { detail = "Indica una carpeta local absoluta válida." });
+    try { return Results.Ok(store.WriteExcel(request.Document.Requirement, directory, excel.Generate(request.Document))); }
+    catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+    { return Results.BadRequest(new { detail = "No se pudo guardar el Excel. Cierra el archivo si está abierto y revisa la ruta, el espacio y los permisos de la carpeta. El archivo anterior se conserva si no fue posible reemplazarlo." }); }
+});
 app.MapGet("/api/documents", (DocumentStore store, string? search, DateOnly? from, DateOnly? to, int? offset) =>
     from > to || (search?.Length ?? 0) > 4000 || offset < 0
         ? Results.BadRequest(new { detail = "Revisa el texto de búsqueda y el rango de fechas." })

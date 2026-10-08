@@ -770,7 +770,9 @@ a {
 .document-bar-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; margin-top: 12px; font-size: 12px; color: #667085; }
 .storage-detail { margin-left: auto; position: relative; }
 .storage-detail summary { cursor: pointer; }
-.storage-detail p { position: absolute; right: 0; top: 20px; width: min(480px,80vw); padding: 12px; background: #fff; border: 1px solid #d9dde5; border-radius: 6px; box-shadow: 0 4px 16px #11131812; }
+.storage-detail .storage-options { position: absolute; right: 0; top: 20px; width: min(480px,80vw); padding: 12px; max-height:50vh; overflow:auto; background: #fff; border: 1px solid #d9dde5; border-radius: 6px; box-shadow: 0 4px 16px #11131812; }
+.storage-options p:last-child { margin-bottom:0; }
+.document-bar .actions > select { width:auto; max-width:100%; padding:8px; }
 .recipients-panel summary { cursor: pointer; font-weight: bold; font-size: 12px; }
 .recipients-panel summary span { font-weight: normal; color: #667085; margin-left: 12px; overflow-wrap: anywhere; }
 .recipients-fields { margin-top: 22px; }
@@ -788,6 +790,20 @@ main { scroll-margin-top: 150px; }
  .document-bar-meta { gap: 6px 12px; font-size: 10px; margin-top: 8px; }
  .document-bar-main .actions { width: 100%; }
  .storage-detail { margin-left: 0; }
- .storage-detail p { right: auto; left: 0; }
+ .storage-detail .storage-options { right: auto; left: 0; }
+ .sidebar .profile-link { display:flex; margin-bottom:12px; }
  .document-identity .eyebrow { display: none; }
 }
+
+/* Workspace tools stay reachable without covering the document header. */
+.profile-link img { width:32px; height:32px; border-radius:50%; object-fit:cover; }
+.profile-link span { overflow:hidden; text-overflow:ellipsis; }
+.profile-link small { display:block; color:#a9aeb8; margin-top:4px; }
+.add-evidence-fixed { position:fixed !important; bottom:24px; right:32px; z-index:10; box-shadow:0 6px 20px #11131826; }
+main:has(.add-evidence-fixed) { padding-bottom:100px; }
+.mail-paper-stage { background:#dde1e7; padding:32px; overflow:auto; border-radius:8px; margin-bottom:20px; }
+.mail-paper { background:white; width:min(100%, 900px); min-height:700px; margin:auto; padding:40px; box-shadow:0 2px 14px #1113181a; }
+.mail-envelope { border-bottom:1px solid #e4e7ec; margin-bottom:28px; padding-bottom:16px; overflow-wrap:anywhere; }
+.mail-paper .email-preview { border:0; padding:0; margin:0; overflow-wrap:anywhere; }
+.mail-paper .email-preview img { max-width:100%; }
+@media(max-width:760px) { .mail-paper-stage { padding:12px; } .mail-paper { padding:18px; } .add-evidence-fixed { right:16px; bottom:16px; } }

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useNotification } from './services/notifications';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import Button from "primevue/button";
 import Textarea from "primevue/textarea";
@@ -8,18 +9,79 @@ import MailEditor from "./components/MailEditor.vue";
 import VoiceButton from "./components/VoiceButton.vue";
 import ThemePicker from "./components/ThemePicker.vue";
 import DraftBrowser from "./components/DraftBrowser.vue";
+import Notifications from "./components/Notifications.vue";
 import AboutGenerator from "./components/AboutGenerator.vue";
+import WorkspaceSettingsPanel from './components/WorkspaceSettings.vue';
+import type { WorkspaceSettings, ExportLocation } from './domain/settings';
+import { applyProfile } from './domain/settings';
 import { newDocument, splitLegacyEvidenceImages } from "./domain/document";
 import { upgradeMailDefaults } from "./domain/mailDefaults";
 import {
-  exportExcel,
+  getSettings, getExcelLocation, saveExcel,
   getDocument,
   saveDocument,
   getStorageInfo,
 } from "./services/api";
 const doc = ref(newDocument());
+const settings = ref<WorkspaceSettings | null>(null);
+const settingsDirty = ref(false);
+const excelLocation = ref<ExportLocation | null>(null);
+const saveExcelDialog = ref(false);
+const excelDirectory = ref('');
+const excelMode = ref<'ask' | 'configured'>('ask');
+let locationRequest = 0;
+watch(() => doc.value.requirement, async requirement => {
+  const request = ++locationRequest;
+  excelLocation.value = null;
+  if (!requirement.trim()) return;
+  try { const location = await getExcelLocation(requirement); if (request === locationRequest) excelLocation.value = location; }
+  catch { /* Export remains available when the location lookup fails. */ }
+});
+async function loadSettings() {
+  try {
+    settings.value = await getSettings();
+    excelMode.value = settings.value.saveMode;
+    if (!doc.value.author && !doc.value.revision) {
+      applyProfile(doc.value, settings.value);
+      if (!dirty.value) savedSnapshot = JSON.stringify(doc.value);
+    }
+  } catch (e) { error.value = e instanceof Error ? e.message : 'No se pudo cargar la configuración.'; }
+}
+function settingsSaved(value: WorkspaceSettings) {
+  settings.value = value;
+  excelMode.value = value.saveMode;
+  settingsDirty.value = false;
+  if (!doc.value.author) doc.value.author = value.name;
+}
+async function changeStep(next: string) {
+  if (next === 'settings' && step.value !== 'settings') await loadSettings();
+  if (settingsDirty.value && next !== 'settings') {
+    pendingNavigation = () => { settingsDirty.value = false; step.value = next; };
+    discardDialog.value = true;
+  } else step.value = next;
+}
+async function prepareExcel() {
+  if (!settings.value) { await loadSettings(); if (!settings.value) return; }
+  excelDirectory.value = excelMode.value === 'ask' && excelLocation.value
+    ? excelLocation.value.path.replace(/[\\/][^\\/]+$/, '') : settings.value.excelDirectory;
+  if (excelMode.value === 'ask') saveExcelDialog.value = true;
+  else await writeExcel();
+}
+async function writeExcel() {
+  await run(async () => {
+    const location = await saveExcel(doc.value, excelDirectory.value);
+    ++locationRequest;
+    excelLocation.value = location;
+    saveExcelDialog.value = false;
+    notice.value = `Excel guardado o actualizado en: ${location.path}`;
+  });
+}
 const step = ref("general");
-watch(step, () => window.scrollTo({ top: 0, behavior: "instant" }), {
+const storageDetails = ref<HTMLDetailsElement>();
+watch(step, () => {
+  window.scrollTo({ top: 0, behavior: "instant" });
+  if (storageDetails.value) storageDetails.value.open = false;
+}, {
   flush: "post",
 });
 const busy = ref(false);
@@ -99,14 +161,15 @@ async function save() {
 }
 function navigate(action: () => void | Promise<void>) {
   if (busy.value) return;
-  if (dirty.value) {
-    pendingNavigation = action;
+  if (dirty.value || settingsDirty.value) {
+    pendingNavigation = () => { settingsDirty.value = false; return action(); };
     discardDialog.value = true;
   } else void action();
 }
 function create() {
   navigate(() => {
     doc.value = newDocument();
+    applyProfile(doc.value, settings.value);
     savedSnapshot = JSON.stringify(doc.value);
     dirty.value = false;
     step.value = "general";
@@ -143,6 +206,7 @@ function open(id: string) {
 function documentDeleted(id: string) {
   if (doc.value.id !== id) return;
   doc.value = newDocument();
+  applyProfile(doc.value, settings.value);
   savedSnapshot = JSON.stringify(doc.value);
   dirty.value = false;
   step.value = "general";
@@ -156,16 +220,20 @@ async function historyDialog() {
   });
 }
 function beforeUnload(event: BeforeUnloadEvent) {
-  if (dirty.value) event.preventDefault();
+  if (dirty.value || settingsDirty.value) event.preventDefault();
 }
 onMounted(() => {
   window.addEventListener("beforeunload", beforeUnload);
   void loadStoragePath();
+  void loadSettings();
 });
 onBeforeUnmount(() => window.removeEventListener("beforeunload", beforeUnload));
+useNotification(error, 'error');
+useNotification(notice, 'success');
 </script>
 
 <template>
+  <Notifications />
   <div class="app-shell">
     <aside class="sidebar">
       <div class="brand">
@@ -173,6 +241,10 @@ onBeforeUnmount(() => window.removeEventListener("beforeunload", beforeUnload));
         <div>Evidence<span>GENERATOR</span></div>
       </div>
       <div class="workspace-label">ESPACIO DE TRABAJO</div>
+      <button class="side-link profile-link" @click="changeStep('settings')">
+        <img v-if="settings?.photo" :src="settings.photo.dataUrl" alt="Tu foto de perfil" />
+        <i v-else class="pi pi-user"></i><span>{{ settings?.name || 'Crear mi perfil' }}<small>Perfil y configuración</small></span>
+      </button>
       <button class="side-link" @click="create">
         <i class="pi pi-plus-circle"></i> Nuevo documento
       </button>
@@ -187,7 +259,7 @@ onBeforeUnmount(() => window.removeEventListener("beforeunload", beforeUnload));
           :key="item.id"
           :class="['step', { active: step === item.id }]"
           :aria-current="step === item.id ? 'step' : undefined"
-          @click="step = item.id"
+          @click="changeStep(item.id)"
         >
           <i :class="item.icon"></i><span>{{ item.label }}</span
           ><small>{{ index + 1 }}</small>
@@ -232,16 +304,12 @@ onBeforeUnmount(() => window.removeEventListener("beforeunload", beforeUnload));
               :disabled="busy"
               @click="save"
             /><Button
-              label="Descargar Excel"
+              label="Guardar Excel"
               icon="pi pi-download"
               :loading="busy"
-              @click="
-                run(async () => {
-                  await exportExcel(doc);
-                  notice = 'Excel generado desde la plantilla original.';
-                })
-              "
+              @click="prepareExcel"
             />
+            <select v-model="excelMode" aria-label="Modo de guardado del Excel" :disabled="busy"><option value="ask">Preguntar ubicación</option><option value="configured">Carpeta configurada</option></select>
           </div>
         </div>
         <div class="document-bar-meta">
@@ -251,19 +319,17 @@ onBeforeUnmount(() => window.removeEventListener("beforeunload", beforeUnload));
           ><span
             ><strong>{{ imageCount }}</strong> capturas</span
           ><span>FO_GDS_07 · v4.0</span>
-          <details class="storage-detail">
+          <details ref="storageDetails" class="storage-detail">
             <summary>Ubicación de borradores</summary>
-            <p class="storage-location">{{ storagePath }}</p>
+            <div class="storage-options">
+            <p class="storage-location"><strong>Borradores:</strong> {{ storagePath }}</p>
+            <p class="storage-location"><strong>Carpeta Excel configurada:</strong> {{ settings?.excelDirectory || 'Sin configurar' }}</p>
+            <p class="storage-location"><strong>Último Excel de este requerimiento:</strong> {{ excelLocation?.path || 'Todavía no se ha guardado' }}</p>
+            </div>
           </details>
         </div>
       </header>
       <main>
-        <div v-if="error" class="message error" role="alert">
-          <i class="pi pi-exclamation-circle"></i>{{ error }}
-        </div>
-        <div v-if="notice" class="message success" role="status">
-          <i class="pi pi-check-circle"></i>{{ notice }}
-        </div>
         <template v-if="step === 'general'">
           <div class="section-heading">
             <div>
@@ -330,11 +396,13 @@ onBeforeUnmount(() => window.removeEventListener("beforeunload", beforeUnload));
           v-else-if="step === 'sql'"
           v-model="doc.sql"
           engine="SQL"
+          :environment-urls="settings?.environmentUrls ?? []" :connections="settings?.connections ?? []"
         />
         <EvidenceEditor
           v-else-if="step === 'oracle'"
           v-model="doc.oracle"
           engine="Oracle"
+          :environment-urls="settings?.environmentUrls ?? []" :connections="settings?.connections ?? []"
         />
         <template v-else-if="step === 'preview'"
           ><div class="section-heading">
@@ -383,7 +451,11 @@ onBeforeUnmount(() => window.removeEventListener("beforeunload", beforeUnload));
               </article>
             </div></section
         ></template>
-        <MailEditor v-else-if="step === 'mail'" v-model="doc" />
+        <MailEditor v-else-if="step === 'mail'" v-model="doc" :contacts="settings?.contacts ?? []" :profile="settings" />
+        <template v-else-if="step === 'settings'">
+          <WorkspaceSettingsPanel v-if="settings" :settings="settings" @saved="settingsSaved" @dirty="settingsDirty = $event" />
+          <section v-else class="panel"><p>No se pudo cargar la configuración.</p><Button label="Reintentar" @click="loadSettings" /></section>
+        </template>
         <AboutGenerator v-else />
       </main>
     </div>
@@ -411,7 +483,7 @@ onBeforeUnmount(() => window.removeEventListener("beforeunload", beforeUnload));
     header="Cambios sin guardar"
     modal
     :style="{ width: '440px', maxWidth: '95vw' }"
-    ><p>Al cambiar de documento perderás los cambios pendientes.</p>
+    ><p>Al continuar perderás los cambios pendientes de la sección que estás abandonando.</p>
     <template #footer
       ><Button
         label="Seguir editando"
@@ -424,4 +496,12 @@ onBeforeUnmount(() => window.removeEventListener("beforeunload", beforeUnload));
           pendingNavigation?.();
         " /></template
   ></Dialog>
+  <Dialog v-model:visible="saveExcelDialog" header="Guardar o actualizar Excel" modal :closable="!busy" :style="{width:'620px',maxWidth:'95vw'}">
+    <p>El archivo del mismo requerimiento se reemplazará en la carpeta elegida. Los borradores se mantienen en su base de datos local.</p>
+    <label>Carpeta de destino (ruta completa)<input v-model="excelDirectory" maxlength="220" :disabled="busy" placeholder="Vacía: usar Descargas del sistema" /></label>
+    <p class="subtle">Si dejas la ruta vacía, el archivo se guardará en Descargas del usuario de Windows.</p>
+    <p class="storage-location">Archivo: Pruebas Unitarias - {{ doc.requirement.trim() }}.xlsx</p>
+
+    <template #footer><Button label="Cancelar" severity="secondary" :disabled="busy" @click="saveExcelDialog=false" /><Button label="Guardar en esta carpeta" icon="pi pi-save" :loading="busy" @click="writeExcel" /></template>
+  </Dialog>
 </template>

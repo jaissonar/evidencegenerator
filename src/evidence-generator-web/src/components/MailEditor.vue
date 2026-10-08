@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import Button from "primevue/button";
+import { notify } from '../services/notifications';
+import MultiSelect from 'primevue/multiselect';
+import type { Contact, WorkspaceSettings } from '../domain/settings';
 import MailBodyEditor from "./MailBodyEditor.vue";
 import type { EvidenceDocument } from "../domain/document";
 import { mailHtml } from "../services/mail";
@@ -9,6 +12,28 @@ import { download } from "../services/api";
 import ImageInput from "./ImageInput.vue";
 import { defaultSignature } from "../domain/mailDefaults";
 const doc = defineModel<EvidenceDocument>({ required: true });
+const props = defineProps<{ contacts: Contact[]; profile: WorkspaceSettings | null }>();
+const previewOnly = ref(false);
+const addresses = (value: string) => value.split(/[;,]/).map(s => s.trim()).filter(Boolean);
+const contactOptions = computed(() => {
+  const options = props.contacts.map(c => ({ email: c.email, label: `${c.name} · ${c.email}` }));
+  for (const email of [...addresses(doc.value.mail.to), ...addresses(doc.value.mail.cc)])
+    if (!options.some(c => c.email.toLowerCase() === email.toLowerCase())) options.push({ email, label: email });
+  return options;
+});
+function recipientModel(field: 'to' | 'cc') {
+  return computed({ get: () => addresses(doc.value.mail[field]), set: (emails: string[]) => {
+    doc.value.mail[field] = emails.join('; ');
+    if (field === 'to') doc.value.mail.recipientName = emails.map(email => props.contacts.find(c => c.email === email)?.name || email).join(', ');
+  } });
+}
+const to = recipientModel('to');
+const cc = recipientModel('cc');
+function useProfileSignature() {
+  if (!props.profile) return;
+  doc.value.mail.signature = props.profile.signature ? { ...props.profile.signature } : null;
+  doc.value.mail.signatureWidth = props.profile.signatureWidth;
+}
 const html = computed(() => mailHtml(doc.value));
 const clipboard = computed(() => prepareMailClipboard(html.value));
 const subject = computed({
@@ -18,7 +43,6 @@ const subject = computed({
     doc.value.mail.subject = value;
   },
 });
-const status = ref("");
 function downloadHtml() {
   download(
     new Blob(
@@ -40,12 +64,11 @@ async function copy(rich: boolean) {
         }),
       ]);
     } else await navigator.clipboard.writeText(clipboard.value.html);
-    status.value = rich
+    notify(rich
       ? "Correo copiado con formato. En Outlook usa Ctrl+V y Mantener formato de origen; el mensaje debe estar en formato HTML. Adjunta el Excel descargado."
-      : "Código HTML copiado.";
+      : "Código HTML copiado.");
   } catch {
-    status.value =
-      "El navegador bloqueó el portapapeles. Puedes descargar el HTML.";
+    notify("El navegador bloqueó el portapapeles. Puedes descargar el HTML.", 'error');
   }
 }
 </script>
@@ -55,17 +78,14 @@ async function copy(rich: boolean) {
       <span class="eyebrow">COMUNICACIÓN</span>
       <h2>Preparar correo</h2>
     </div>
-    <span class="pill">Tahoma {{ doc.mail.fontSize }} pt</span>
+    <div class="actions"><span class="pill">Tahoma {{ doc.mail.fontSize }} pt</span><Button :label="previewOnly ? 'Volver al editor' : 'Vista previa del correo'" :icon="previewOnly ? 'pi pi-pencil' : 'pi pi-eye'" severity="secondary" @click="previewOnly = !previewOnly" /></div>
   </div>
+  <div v-show="!previewOnly">
   <details class="panel recipients-panel"><summary>Destinatarios y asunto <span>{{ doc.mail.to || 'Sin destinatarios' }}</span></summary><div class="fields two recipients-fields">
     <label
-      >Para<input
-        v-model="doc.mail.to"
-        placeholder="Destinatarios; separados por punto y coma" /></label
+      >Para<MultiSelect v-model="to" :options="contactOptions" option-label="label" option-value="email" filter display="chip" :show-toggle-all="false" placeholder="Buscar nombre o correo" /></label
     ><label
-      >CC<input
-        v-model="doc.mail.cc"
-        placeholder="Copias; separadas por punto y coma" /></label
+      >CC<MultiSelect v-model="cc" :options="contactOptions" option-label="label" option-value="email" filter display="chip" :show-toggle-all="false" placeholder="Seleccionar copias" /></label
     ><label
       >Nombre para el saludo<input
         v-model="doc.mail.recipientName"
@@ -80,6 +100,7 @@ async function copy(rich: boolean) {
         v-model="subject"
         :placeholder="`Pruebas Unitarias - ${doc.requirement}`"
     /></label>
+    <p class="subtle full">Administra los contactos en Perfil y configuración. Puedes seleccionar varios; los destinatarios anteriores también se conservan.</p>
   </div></details>
   <MailBodyEditor v-model="doc" />
   <details class="panel signature-panel">
@@ -96,6 +117,7 @@ async function copy(rich: boolean) {
         </select></label
       >
       <div class="actions">
+        <Button label="Usar firma de mi perfil" severity="secondary" :disabled="!profile?.revision" @click="useProfileSignature" />
         <Button
           label="Usar firma predeterminada"
           severity="secondary"
@@ -122,12 +144,17 @@ async function copy(rich: boolean) {
     </p>
     </div>
   </details>
-  <section class="panel">
+  </div>
+  <section v-show="previewOnly" class="panel mail-preview-panel">
     <div class="section-heading compact">
       <h3>Vista previa del cuerpo</h3>
       <Button label="Copiar correo" icon="pi pi-copy" @click="copy(true)" />
     </div>
-    <div class="email-preview" v-html="clipboard.fragment"></div>
+    <p class="subtle">Hoja de solo lectura. Muestra la estructura del correo; su apariencia final puede variar ligeramente en Outlook.</p>
+    <div class="mail-paper-stage"><article class="mail-paper" aria-label="Vista previa del correo, solo lectura">
+      <div class="mail-envelope"><p><strong>Para:</strong> {{ doc.mail.to || 'Sin destinatarios' }}</p><p v-if="doc.mail.cc"><strong>CC:</strong> {{ doc.mail.cc }}</p><p><strong>Asunto:</strong> {{ subject }}</p></div>
+      <div class="email-preview" v-html="clipboard.fragment"></div>
+    </article></div>
     <div class="actions">
       <Button
         label="Copiar HTML"
@@ -139,7 +166,6 @@ async function copy(rich: boolean) {
         @click="downloadHtml"
       />
     </div>
-    <p v-if="status" role="status">{{ status }}</p>
   </section>
   <p class="subtle">
     Para, CC y asunto se guardan con el borrador y se trasladan manualmente a

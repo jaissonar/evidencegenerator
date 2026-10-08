@@ -21,7 +21,7 @@ test('eliminar evidencias SQL y Oracle con confirmación y persistencia', async 
     await expect(page.getByLabel('Descripción de la validación')).toHaveValue(`Conservar ${engine}`);
   }
   await page.getByRole('button',{name:'Guardar borrador'}).click();
-  await expect(page.locator('.message.success')).toContainText('Borrador guardado');
+  await expect(page.locator('.message.success').last()).toContainText('Borrador guardado');
   await page.reload();
   await page.getByRole('button',{name:'Borradores locales'}).click();
   await page.getByLabel('Buscar borradores').fill(name);

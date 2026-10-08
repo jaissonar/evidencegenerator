@@ -131,16 +131,16 @@ En este modo debes detener ambas terminales con Ctrl+C. No inicies el lanzador a
 
 ## 4. Cómo utilizarlo
 
-1. Completa requerimiento, autor, fecha, cliente y descripción.
-2. Define sitio y conexión para SQL y Oracle; los sitios admiten texto libre con sugerencias.
-3. Agrega evidencias: cada una tiene descripción y **una imagen**. Puedes cargar, arrastrar o pegar con Ctrl+V en el área de imagen. Para reemplazarla, quita la actual. Las evidencias se pueden ordenar, plegar y eliminar con confirmación.
+1. En **Perfil y configuración**, guarda nombre, foto opcional, carpeta Excel, firma, contactos y ambientes. Al crear documentos nuevos, el responsable se completa con tu nombre. Completa requerimiento, fecha, cliente y descripción.
+2. En SQL y Oracle selecciona una URL y una conexión de sus listas independientes, o escríbelas manualmente. Las listas se comparten entre ambos motores; elegir una URL no cambia la conexión.
+3. Agrega evidencias: cada una tiene descripción y **una imagen**. Puedes cargar, arrastrar o pegar con Ctrl+V en el área de imagen. Para reemplazarla, quita la actual. Las evidencias se pueden ordenar, plegar y eliminar con confirmación. El botón **Agregar evidencia** permanece fijo abajo y lleva a la evidencia nueva.
 4. Pulsa **Guardar borrador**. En **Borradores locales** puedes buscar por requerimiento, cliente o descripción, filtrar por fecha del documento, abrir o eliminar. Eliminar un documento es definitivo; eliminar una evidencia se conserva al guardar el borrador.
-5. Revisa y descarga el Excel. Las imágenes ocupan **42 filas de altura original**, con ancho proporcional y borde oscuro de 1 pt. El área de impresión se amplía cuando hace falta. La vista previa no reproduce la paginación exacta de Excel.
-6. En **Preparar correo**, despliega Destinatarios y asunto, personaliza el cuerpo y configura la firma plegable. Los avisos ambiental/confidencialidad son fijos. Copia con **Copiar correo** y pega en Outlook usando formato HTML y **Mantener formato de origen**; adjunta el Excel.
+5. Si no configuras una ruta o la dejas vacía, se usará **Descargas del usuario de Windows**. Pulsa **Guardar Excel**: elige **Preguntar ubicación** para indicar una ruta completa, o **Carpeta configurada**. El archivo del mismo requerimiento se actualiza en esa carpeta, sin sufijos. Cierra Excel antes de reemplazarlo. La ruta efectiva aparece en **Ubicación de borradores**. Las imágenes ocupan **42 filas de altura original**, con ancho proporcional y borde oscuro de 1 pt. El área de impresión se amplía cuando hace falta. La vista previa no reproduce la paginación exacta de Excel.
+6. En **Preparar correo**, despliega Destinatarios y asunto, personaliza el cuerpo y configura la firma plegable. Los avisos ambiental/confidencialidad son fijos. Selecciona contactos filtrando por nombre/correo en Para y CC. Abre **Vista previa del correo** para ver una hoja de solo lectura separada del editor. Copia con **Copiar correo** y pega en Outlook usando formato HTML y **Mantener formato de origen**; adjunta el Excel.
 
 El cuerpo personalizado se guarda con el borrador. **Regenerar desde los datos** reemplaza esa personalización tras confirmar. La compatibilidad del pegado y las imágenes de firma depende del cliente de correo.
 
-La cabecera fija mantiene disponibles acciones y resumen. La interfaz usa Tahoma con tamaño base de 12 px; el correo conserva sus tamaños independientes. Los temas de color se recuerdan en una cookie. **Acerca del generador** explica el objetivo y las tecnologías. El dictado necesita permisos y puede utilizar el servicio en línea del navegador.
+Las notificaciones flotantes se cierran tras 5 segundos activos; el cursor o el foco de teclado pausan el contador. Los errores permanecen hasta cerrarlos con la X. La cabecera fija mantiene disponibles acciones y resumen. La interfaz usa Tahoma con tamaño base de 12 px; el correo conserva sus tamaños independientes. Los temas de color se recuerdan en una cookie. **Acerca del generador** explica el objetivo y las tecnologías. El dictado necesita permisos y puede utilizar el servicio en línea del navegador.
 
 Los borradores antiguos con varias imágenes se separan en evidencias individuales al abrirlos, sin perder capturas; se guardan convertidos cuando lo decides. Si exceden 50 evidencias por motor, la interfaz informa para distribuir el contenido.
 
@@ -167,7 +167,7 @@ Pop-Location
 
 La compilación del frontend genera `src/evidence-generator-web/dist`. Las pruebas de navegador utilizan Microsoft Edge (`channel: msedge`); instalar solamente Chromium no sustituye ese requisito con la configuración actual. Playwright inicia una API con datos aislados en `work/e2e-data` y reutiliza Vite si ya está activo. No utiliza los borradores reales. Los resultados y capturas quedan en `work`.
 
-Última validación funcional previa a esta actualización documental: **14 pruebas backend, 9 frontend y 6 recorridos de navegador correctos**. La advertencia de Vite sobre el tamaño del archivo JavaScript no es un fallo de compilación; el paquete incluye el editor y la firma incorporada.
+Validación del 8 de octubre de 2026: **17 pruebas backend, 11 frontend y 8 recorridos de navegador correctos**. Incluyen perfil, contactos, ambientes y actualización del Excel. Consulta el informe de verificación para el resultado integral. La advertencia de Vite sobre el tamaño del archivo JavaScript no es un fallo de compilación; el paquete incluye el editor y la firma incorporada.
 
 ## 6. Publicar para otro equipo
 
@@ -201,9 +201,13 @@ Copia **toda** la carpeta publicada, no solo el ejecutable. La publicación es p
 | Versión publicada | `artifacts/local/App_Data/evidence.db` o `App_Data` junto al ejecutable trasladado |
 | Pruebas integrales | `work/e2e-data/evidence.db` |
 
-La base se crea automáticamente. Desarrollo y publicación usan carpetas distintas: cambiar de modo no migra los borradores. Puedes comprobar la ubicación efectiva en la cabecera o en `/api/storage`.
+La base guarda borradores, perfil, foto, firma predeterminada, contactos, ambientes y la última ruta Excel por requerimiento. Los Excel se almacenan por separado en la carpeta elegida; respalda también esa carpeta. La base se crea automáticamente. Desarrollo y publicación usan carpetas distintas: cambiar de modo no migra los borradores. Puedes comprobar la ubicación efectiva en la cabecera o en `/api/storage`.
 
 Antes de actualizar o trasladar datos, detén la aplicación y copia la carpeta **App_Data completa** a un respaldo independiente. Conserva también los archivos auxiliares SQLite si existen. No borres esa carpeta para solucionar problemas de paquetes. El [manual](docs/Manual-Evidence-Generator.md) explica restauración y configuración de `DataDirectory`.
+
+La configuración es de uso individual y local, no una cuenta ni autenticación. Cambiarla no modifica borradores anteriores. Cambiar de carpeta o de requerimiento crea un archivo en la nueva ubicación; no elimina archivos anteriores. Dos borradores con el mismo requerimiento y la misma carpeta actualizan el mismo Excel. Eliminar un borrador no elimina sus Excel. Guardar Excel no guarda automáticamente el borrador.
+
+Consulta [Perfil, configuración y guardado](docs/Perfil-y-almacenamiento.md) para los pasos y detalles técnicos.
 
 ## 8. Problemas frecuentes
 

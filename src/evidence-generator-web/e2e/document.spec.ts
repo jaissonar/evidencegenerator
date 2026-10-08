@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { test, expect } from "@playwright/test";
 test("documento completo: imágenes, orden, persistencia, Excel, correo y móvil", async ({
   page,
@@ -92,10 +93,12 @@ test("documento completo: imágenes, orden, persistencia, Excel, correo y móvil
   await page.locator(".evidence-card input[type=file]").setInputFiles(image);
   await expect(page.locator(".capture img")).toHaveCount(1);
   await page.getByRole("button", { name: "Guardar borrador" }).click();
-  await expect(page.locator(".message.success")).toContainText("Borrador guardado");
-  const download = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Descargar Excel" }).click();
-  await (await download).saveAs("../../work/verified-export.xlsx");
+  await expect(page.locator(".message.success").last()).toContainText("Borrador guardado");
+  await page.getByLabel("Modo de guardado del Excel").selectOption("ask");
+  await page.getByRole("button", { name: "Guardar Excel", exact:true }).click();
+  await page.getByLabel("Carpeta de destino (ruta completa)").fill(path.resolve("../../work/e2e-exports"));
+  await page.getByRole("button", {name:"Guardar en esta carpeta"}).click();
+  await expect(page.locator(".message.success").last()).toContainText("Excel guardado");
   await page.getByRole("button", { name: "Preparar correo" }).click();
   await page.locator(".recipients-panel summary").click();
   await page.getByLabel("Nombre para el saludo").fill("Nicolás");
@@ -123,15 +126,17 @@ test("documento completo: imágenes, orden, persistencia, Excel, correo y móvil
   await expect(
     page.locator(".email-preview p").filter({ hasText: "¡Salva un árbol" }),
   ).toHaveCSS("font-size", "10.6667px");
+  await page.getByRole("button",{name:"Vista previa del correo",exact:true}).click();
   await page.screenshot({ path: "../../work/ui-mail.png", fullPage: true });
   await page
     .locator(".email-preview")
     .screenshot({ path: "../../work/mail-preview.png" });
+  await page.getByRole("button",{name:"Volver al editor"}).click();
   await page.locator("input[type=file]").setInputFiles(image);
   await expect(page.locator(".email-preview img")).toHaveCount(1);
   await page.getByRole("button", { name: "Usar firma predeterminada" }).click();
   await page.getByRole("button", { name: "Guardar borrador" }).click();
-  await expect(page.locator(".message.success")).toContainText("Borrador guardado");
+  await expect(page.locator(".message.success").last()).toContainText("Borrador guardado");
   await page.reload();
   await page.getByRole("button", { name: "Borradores locales" }).click();
   await page.locator(".history-item").first().click();

@@ -12,7 +12,7 @@ export default defineConfig({
   webServer: [
     {
       command:
-        "dotnet run --project ../EvidenceGenerator.Api --no-launch-profile --urls http://127.0.0.1:5080 -- --DataDirectory ../../work/e2e-data",
+        `dotnet run --project ../EvidenceGenerator.Api --no-launch-profile --urls http://127.0.0.1:5080 -- --DataDirectory ../../work/e2e-data/${Date.now()}`,
       url: "http://127.0.0.1:5080/api/health",
       reuseExistingServer: false,
       timeout: 60000,

@@ -10,7 +10,7 @@ test('buscar borradores y guardar correo con formato y avisos fijos', async ({pa
   await editor.fill('Texto de correo personalizado');
   await editor.press('Control+a');
   await page.getByRole('button',{name:'Negrita',exact:true}).click();
-  await expect(page.locator('.email-preview strong').filter({hasText:'Texto de correo personalizado'})).toBeVisible();
+  await expect(page.locator('.email-preview strong').filter({hasText:'Texto de correo personalizado'})).toHaveCount(1);
   await page.locator('.ql-font select, select.ql-font').selectOption('Georgia',{force:true});
   await page.locator('select.ql-size').selectOption('18pt',{force:true});
   await page.locator('select.ql-align').selectOption('justify',{force:true});
@@ -20,7 +20,7 @@ test('buscar borradores y guardar correo con formato y avisos fijos', async ({pa
   await expect(page.getByLabel('Aviso ambiental',{exact:true})).toHaveCount(0);
   await expect(page.locator('.email-preview')).toContainText('¡Salva un árbol');
   await page.getByRole('button',{name:'Guardar borrador'}).click();
-  await expect(page.locator('.message.success')).toContainText('Borrador guardado');
+  await expect(page.locator('.message.success').last()).toContainText('Borrador guardado');
   await page.reload();
   await page.getByRole('button',{name:'Borradores locales'}).click();
   await page.getByLabel('Buscar borradores').fill('cliente editor unico');
@@ -28,7 +28,7 @@ test('buscar borradores y guardar correo con formato y avisos fijos', async ({pa
   await expect(page.locator('.history-item').first()).toContainText('MD EDITOR 777');
   await page.locator('.history-item').first().click();
   await page.getByRole('button',{name:'Preparar correo'}).click();
-  await expect(page.locator('.email-preview strong').filter({hasText:'Texto de correo personalizado'})).toBeVisible();
+  await expect(page.locator('.email-preview strong').filter({hasText:'Texto de correo personalizado'})).toHaveCount(1);
   await expect(editor).toContainText('Texto de correo personalizado');
   await page.getByRole('button',{name:'Regenerar desde los datos'}).click();
   await page.getByRole('button',{name:'Regenerar',exact:true}).click();

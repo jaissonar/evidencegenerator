@@ -9,6 +9,7 @@ import type { StyleAttributor } from 'parchment';
 import type { EvidenceDocument } from '../domain/document';
 import { defaultMailBody } from '../services/mail';
 import { sanitizeMailBody } from '../services/mailBody';
+import { useNotification } from '../services/notifications';
 const fonts = ['Tahoma','Arial','Calibri','Verdana','Georgia','Times New Roman'];
 const sizes = ['8pt','9pt','10pt','11pt','12pt','14pt','16pt','18pt','24pt','32pt'];
 const font = Quill.import('attributors/style/font') as StyleAttributor;
@@ -16,6 +17,8 @@ font.whitelist = fonts; Quill.register(font, true);
 const size = Quill.import('attributors/style/size') as StyleAttributor;
 size.whitelist = sizes; Quill.register(size, true);
 const doc = defineModel<EvidenceDocument>({required:true});
+const sizeError = computed(() => (doc.value.mail.bodyHtml?.length ?? 0) > 100000 ? 'El cuerpo supera el límite de 100.000 caracteres HTML. Reduce su contenido antes de guardar.' : '');
+useNotification(sizeError, 'error');
 const resetDialog = ref(false);
 const editorKey = ref(0);
 const body = computed({
@@ -37,7 +40,6 @@ function reset() { doc.value.mail.bodyHtml = null; editorKey.value++; resetDialo
         <span class="ql-formats"><button class="ql-link" aria-label="Insertar enlace"></button><button class="ql-clean" aria-label="Quitar formato"></button></span>
       </template>
     </Editor>
-    <p v-if="(doc.mail.bodyHtml?.length ?? 0) > 100000" role="alert" class="error-text">El cuerpo supera el límite de 100.000 caracteres HTML. Reduce su contenido antes de guardar.</p>
     <Dialog v-model:visible="resetDialog" header="Regenerar cuerpo" modal :style="{width:'440px',maxWidth:'95vw'}"><p>Se reemplazará el texto y formato personalizado por los datos actuales del documento. La firma se conserva.</p><template #footer><Button label="Cancelar" severity="secondary" @click="resetDialog=false" /><Button label="Regenerar" @click="reset" /></template></Dialog>
   </section>
 </template>

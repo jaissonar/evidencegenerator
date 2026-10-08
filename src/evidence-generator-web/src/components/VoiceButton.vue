@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useNotification } from '../services/notifications';
 import { onBeforeUnmount, ref } from "vue";
 import Button from "primevue/button";
 interface Recognition {
@@ -56,6 +57,7 @@ function dictate() {
   }
 }
 onBeforeUnmount(() => recognition?.abort());
+useNotification(error, 'error');
 </script>
 <template>
   <div>
@@ -67,6 +69,6 @@ onBeforeUnmount(() => recognition?.abort());
       :disabled="!Speech"
       @click="dictate"
     /><small v-if="!Speech">Este navegador no admite dictado.</small
-    ><small v-if="error" role="alert">{{ error }}</small>
+    >
   </div>
 </template>

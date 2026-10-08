@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useNotification } from '../services/notifications';
 import { ref, onMounted } from "vue";
 import Button from "primevue/button";
 import Dialog from "primevue/dialog";
@@ -48,6 +49,9 @@ async function load(append = false) {
 }
 function clear() { search.value = from.value = to.value = ""; void load(); }
 onMounted(() => load());
+useNotification(error, 'error');
+useNotification(deleteError, 'error');
+useNotification(deletionNotice, 'success');
 </script>
 <template>
   <form class="fields two" @submit.prevent="load()">
@@ -56,8 +60,8 @@ onMounted(() => load());
     <label>Fecha del documento hasta<input v-model="to" :disabled="busy" type="date" /></label>
     <div class="actions full"><Button type="submit" label="Buscar" icon="pi pi-search" :loading="busy" /><Button label="Limpiar filtros" severity="secondary" :disabled="busy" @click="clear" /></div>
   </form>
-  <p v-if="error" role="alert" class="error-text">{{ error }}</p>
-  <p v-if="deletionNotice" role="status">{{ deletionNotice }}</p>
+
+
   <p class="subtle" role="status">{{ busy ? 'Buscando…' : `${rows.length} borradores mostrados` }}</p>
   <p v-if="!busy && !error && !rows.length">No hay borradores que coincidan con estos filtros.</p>
   <div v-for="item in rows" :key="item.id" class="history-row">
@@ -71,7 +75,7 @@ onMounted(() => load());
     <p>¿Eliminar <strong>{{ deletionTarget?.requirement }}</strong> de {{ deletionTarget?.client || 'Sin cliente' }}?</p>
     <p>Se eliminará el borrador con sus evidencias, imágenes y correo guardado. Esta acción no se puede deshacer. Los archivos Excel y HTML descargados se conservan.</p>
     <p v-if="deletionTarget?.id === activeId">Es el documento abierto actualmente; también se cerrará{{ activeDirty ? ' y se descartarán sus cambios sin guardar' : '' }}.</p>
-    <p v-if="deleteError" role="alert" class="error-text">{{ deleteError }}</p>
+
     <template #footer><Button label="Cancelar" severity="secondary" :disabled="deleting" @click="confirmingDelete=false" /><Button label="Eliminar definitivamente" severity="danger" :loading="deleting" :disabled="disabled" @click="remove" /></template>
   </Dialog>
 </template>

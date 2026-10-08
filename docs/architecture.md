@@ -81,3 +81,7 @@ El correo muestra solo Entorno SQL. La firma suministrada se inicializa en 420 p
 
 
 
+
+## Preferencias y guardado local (8 de octubre de 2026)
+
+WorkspaceStore comparte evidence.db con DocumentStore: WorkspaceSettings guarda el perfil/configuración con revisión optimista y ExcelLocation registra la última ruta por requerimiento. Document permanece compatible. Contactos y ambientes son catálogos locales; al seleccionar un ambiente se copian sus valores al documento para evitar modificar retrospectivamente borradores. La exportación de la UI usa POST /api/exports/save y escritura temporal con reemplazo en la misma carpeta. El endpoint anterior /api/exports/excel permanece disponible para clientes existentes. Consulta Perfil-y-almacenamiento.md para límites y contratos.

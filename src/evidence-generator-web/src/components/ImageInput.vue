@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useNotification } from '../services/notifications';
 import { ref } from "vue";
 import Button from "primevue/button";
 import { normalizeImage } from "../services/images";
@@ -39,6 +40,7 @@ function paste(event: ClipboardEvent) {
     void add(files);
   }
 }
+useNotification(error, 'error');
 </script>
 <template>
   <div
@@ -70,5 +72,5 @@ function paste(event: ClipboardEvent) {
       @change="add(Array.from(($event.target as HTMLInputElement).files ?? []))"
     />
   </div>
-  <p v-if="error" role="alert" class="error-text">{{ error }}</p>
+
 </template>
